@@ -1,0 +1,74 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+        <preConditions>
+            <dbms type="mysql"/>
+        </preConditions>
+    <changeSet id="1" author="taorusb">
+        <sqlFile encoding="UTF-8"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 path="/sql/id-1_create_users_table"/>
+    </changeSet>
+
+    <changeSet id="2" author="taorusb">
+        <sqlFile encoding="UTF-8"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 path="/sql/id-2_create_files_table"/>
+    </changeSet>
+
+    <changeSet id="3" author="taorusb">
+        <sqlFile dbms="mysql"
+                 encoding="UTF-8"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 path="/sql/id-3_create_events_table"/>
+    </changeSet>
+
+    <changeSet id="4" author="taorusb">
+        <sqlFile dbms="mysql"
+                 encoding="UTF-8"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 path="/sql/id-4_create_roles_table"/>
+    </changeSet>
+
+    <changeSet id="5" author="taorusb">
+        <sqlFile dbms="mysql"
+                 encoding="UTF-8"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 path="/sql/id-5_create_user_roles_table"/>
+    </changeSet>
+
+    <changeSet id="6" author="taorusb">
+        <sqlFile dbms="mysql"
+                 encoding="UTF-8"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 endDelimiter="\nGO"
+                 path="/sql/id-6_insert_into_users"/>
+    </changeSet>
+
+    <changeSet id="7" author="taorusb">
+        <sqlFile dbms="mysql"
+                 encoding="UTF-8"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 endDelimiter="\nGO"
+                 path="/sql/id-7_insert_into_roles"/>
+    </changeSet>
+
+    <changeSet id="8" author="taorusb">
+        <sqlFile dbms="mysql"
+                 encoding="UTF-8"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 endDelimiter="\nGO"
+                 path="/sql/id-8_insert_into_user_roles"/>
+    </changeSet>
+
+</databaseChangeLog>
