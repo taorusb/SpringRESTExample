@@ -21,11 +21,11 @@ public class EventServiceImplTest {
 
     @InjectMocks
     EventServiceImpl eventService;
+
     @Mock
     EventRepository eventRepository;
 
     Event event = new Event();
-
 
     @Before
     public void setUp() {

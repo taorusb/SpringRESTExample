@@ -28,12 +28,15 @@ public class UserServiceImplTest {
 
     User user = new User();
     Role role = new Role();
+
     @InjectMocks
     UserServiceImpl userService;
     @Mock
     UserRepository userRepository;
+
     @Mock
     RoleRepository roleRepository;
+
     @Mock
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -56,13 +59,11 @@ public class UserServiceImplTest {
 
     @Test
     public void save_returns_user() {
-        User forSave = new User();
-        forSave.setUsername("username");
-        forSave.setPassword("123");
-        when(roleRepository.findByName("ROLE_USER")).thenReturn(role);
         when(bCryptPasswordEncoder.encode("123")).thenReturn("123");
-        when(userRepository.save(any(User.class))).thenReturn(forSave);
-        assertEquals(user, userService.save(forSave));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        assertEquals(1L, userService.save(user).getId());
+        assertEquals("username", userService.save(user).getUsername());
+        assertEquals("123", userService.save(user).getPassword());
     }
 
     @Test
@@ -99,12 +100,11 @@ public class UserServiceImplTest {
 
     @Test
     public void update_returns_user() {
-        User forUpdate = new User();
-        forUpdate.setId(1L);
-        forUpdate.setUsername("user");
-        when(userRepository.findById(anyLong())).thenReturn(java.util.Optional.ofNullable(forUpdate));
-        assertEquals("user", userService.update(forUpdate).getUsername());
-        assertEquals(1L, userService.update(forUpdate).getId());
+        when(bCryptPasswordEncoder.encode("123")).thenReturn("123");
+        when(userRepository.findById(anyLong())).thenReturn(java.util.Optional.ofNullable(user));
+        assertEquals(1L, userService.update(user).getId());
+        assertEquals("username", userService.update(user).getUsername());
+        assertEquals("123", userService.update(user).getPassword());
     }
 
     @Test

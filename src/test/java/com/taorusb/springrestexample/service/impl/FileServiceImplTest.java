@@ -29,8 +29,10 @@ public class FileServiceImplTest {
     FileServiceImpl fileService;
     @Mock
     FileRepository fileRepository;
+
     @Mock
     EventRepository eventRepository;
+
     @Mock
     UserRepository userRepository;
     @Mock
@@ -71,13 +73,13 @@ public class FileServiceImplTest {
 
     @Test
     public void update_returns_file() {
-        File forUpdate = new File();
-        forUpdate.setId(1L);
-        when(fileRepository.getById(anyLong())).thenReturn(forUpdate);
+        when(fileRepository.getById(anyLong())).thenReturn(file);
         when(awsS3Actions.addObject(anyString(), anyString())).thenReturn("url");
+        assertEquals(1L, fileService.update(file).getId());
         assertEquals("url", fileService.update(file).getURL());
         assertEquals("name", fileService.update(file).getName());
         assertEquals("path", fileService.update(file).getPath());
+        assertEquals("1-username/", fileService.update(file).getFilePointer());
     }
 
     @Test
@@ -90,8 +92,11 @@ public class FileServiceImplTest {
         when(userRepository.getById(anyLong())).thenReturn(user);
         when(awsS3Actions.addObject(anyString(), anyString())).thenReturn("url");
         when(fileRepository.save(file)).thenReturn(file);
-        File fileForCheck = fileService.save(file);
-        assertEquals(file, fileForCheck);
+        assertEquals(1L, fileService.save(file).getId());
+        assertEquals("url", fileService.save(file).getURL());
+        assertEquals("name", fileService.save(file).getName());
+        assertEquals("path", fileService.save(file).getPath());
+        assertEquals("1-username/", fileService.save(file).getFilePointer());
     }
 
     @Test
