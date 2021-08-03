@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class AdminUserControllerV1 {
+public class AdminRestUserControllerV1 {
 
     private final UserService userService;
 
     @Autowired
-    public AdminUserControllerV1(UserService userService) {
+    public AdminRestUserControllerV1(UserService userService) {
         this.userService = userService;
     }
 

@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = ObjectMapper.class)
-public class FileControllerV1Test {
+public class FileRestControllerV1Test {
 
     MockMvc mockMvc;
 
@@ -36,7 +36,7 @@ public class FileControllerV1Test {
     FileService fileService;
 
     @MockBean
-    FileControllerV1 fileControllerV1;
+    FileRestControllerV1 fileRestControllerV1;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -50,10 +50,10 @@ public class FileControllerV1Test {
         file.setPath("/test/folder/1.txt");
         file.setUserId(1L);
         file.setName("1.txt");
-        file.setURL("url");
+        file.setLink("url");
         file.setFilePointer("1-username/");
         fileList.add(file);
-        mockMvc = MockMvcBuilders.standaloneSetup(new FileControllerV1(fileService)).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(new FileRestControllerV1(fileService)).build();
         when(fileService.getByUserId(1L)).thenReturn(fileList);
         when(fileService.getByUserId(2L)).thenThrow(EntityNotFoundException.class);
         when(fileService.getSingleByUserId(1L, 1L)).thenReturn(file);
@@ -63,7 +63,7 @@ public class FileControllerV1Test {
     @WithMockUser
     @Test
     public void getMore_returns_200() throws Exception {
-        mockMvc.perform(get("/api/v1/users/{id}/files", 1L))
+        mockMvc.perform(get("/api/v1/users/{userId}/files", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(fileList.size())));
     }
@@ -78,11 +78,11 @@ public class FileControllerV1Test {
     @WithMockUser
     @Test
     public void getOne_returns_200() throws Exception {
-        mockMvc.perform(get("/api/v1/users/{id}/files/{fileId}", 1L, 1L))
+        mockMvc.perform(get("/api/v1/users/{userId}/files/{id}", 1L, 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("1.txt")))
-                .andExpect(jsonPath("$.url", is("url")));
+                .andExpect(jsonPath("$.link", is("url")));
     }
 
     @WithMockUser
@@ -102,7 +102,7 @@ public class FileControllerV1Test {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("1.txt")))
-                .andExpect(jsonPath("$.url", is("url")));
+                .andExpect(jsonPath("$.link", is("url")));
 
     }
 
@@ -139,7 +139,7 @@ public class FileControllerV1Test {
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("1.txt")))
-                .andExpect(jsonPath("$.url", is("url")));
+                .andExpect(jsonPath("$.link", is("url")));
     }
 
     @WithMockUser
@@ -167,20 +167,20 @@ public class FileControllerV1Test {
     @WithMockUser
     @Test
     public void deleteFile_returns_202() throws Exception {
-        when(fileService.getById(1L)).thenReturn(file);
+        when(fileService.delete(1L)).thenReturn(file);
         mockMvc.perform(delete("/api/v1/file/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(file)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("1.txt")))
-                .andExpect(jsonPath("$.url", is("url")));
+                .andExpect(jsonPath("$.link", is("url")));
     }
 
     @WithMockUser
     @Test
     public void deleteFile_returns_404() throws Exception {
-        when(fileService.getById(1L)).thenThrow(EntityNotFoundException.class);
+        when(fileService.delete(1L)).thenThrow(EntityNotFoundException.class);
         mockMvc.perform(delete("/api/v1/file/{id}", 1L))
                 .andExpect(status().isNotFound());
     }

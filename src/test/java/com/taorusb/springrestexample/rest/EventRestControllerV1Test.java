@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = ObjectMapper.class)
-public class EventControllerV1Test {
+public class EventRestControllerV1Test {
 
     MockMvc mockMvc;
 
@@ -36,7 +36,7 @@ public class EventControllerV1Test {
     EventService eventService;
 
     @MockBean
-    EventControllerV1 eventControllerV1;
+    EventRestControllerV1 eventRestControllerV1;
 
     List<Event> eventList = new ArrayList<>();
     Event event = new Event();
@@ -50,7 +50,7 @@ public class EventControllerV1Test {
         event.setUploadDate(new Date());
         event.setFile(file);
         eventList.add(event);
-        mockMvc = MockMvcBuilders.standaloneSetup(new EventControllerV1(eventService)).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(new EventRestControllerV1(eventService)).build();
         when(eventService.findEventsByUserId(1L)).thenReturn(eventList);
         when(eventService.findEventsByUserId(2L)).thenThrow(EntityNotFoundException.class);
         when(eventService.findEventByIdAndUserId(1L, 1L)).thenReturn(event);
@@ -75,7 +75,7 @@ public class EventControllerV1Test {
     @WithMockUser
     @Test
     public void getOne_returns_200() throws Exception {
-        mockMvc.perform(get("/api/v1/users/{id}/events/{eventId}", 1L, 1L))
+        mockMvc.perform(get("/api/v1/users/{userId}/events/{id}", 1L, 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.uploadDate", is(simpleDateFormat.format(new Date()))))

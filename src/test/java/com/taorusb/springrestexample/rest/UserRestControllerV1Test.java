@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = ObjectMapper.class)
-public class UserControllerV1Test {
+public class UserRestControllerV1Test {
 
     MockMvc mockMvc;
 
@@ -37,7 +37,7 @@ public class UserControllerV1Test {
     UserService userService;
 
     @MockBean
-    UserControllerV1 userControllerV1;
+    UserRestControllerV1 userRestControllerV1;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -47,7 +47,7 @@ public class UserControllerV1Test {
 
     @Before
     public void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new UserControllerV1(userService)).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(new UserRestControllerV1(userService)).build();
         user.setId(1L);
         user.setPassword("123");
         user.setUsername("username");

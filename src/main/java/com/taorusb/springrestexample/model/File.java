@@ -6,6 +6,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "files")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "file_type")
 @Data
 public class File extends BaseEntity {
 
@@ -20,7 +22,7 @@ public class File extends BaseEntity {
     @Column(name = "file_pointer")
     private String filePointer;
 
-    @Column(name = "url")
-    private String URL;
+    @Column(name = "link")
+    private String link;
 
 }

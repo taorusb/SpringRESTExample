@@ -3,28 +3,38 @@ package com.taorusb.springrestexample.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.taorusb.springrestexample.model.File;
 import lombok.Data;
-import org.intellij.lang.annotations.Pattern;
 
-import java.util.Objects;
+import javax.validation.constraints.NotNull;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FileDto {
 
-    private Long userId;
+    public interface PostReq {
+
+    }
+
+    public interface PutReq {
+
+    }
+
+
+    @NotNull(groups = PutReq.class)
     private Long id;
+    @NotNull(groups = PostReq.class)
+    private Long userId;
     private String name;
-    private String URL;
+    private String link;
+    @NotNull(groups = {PostReq.class, PutReq.class})
     private String path;
 
     public File toFile() {
         File file = new File();
         file.setId(id);
-        checkFile(path);
+        file.setUserId(userId);
         file.setPath(path);
         file.setName(getFileName(path));
-        file.setURL(URL);
-        file.setUserId(userId);
+        file.setLink(link);
         return file;
     }
 
@@ -32,14 +42,8 @@ public class FileDto {
         FileDto fileDto = new FileDto();
         fileDto.setId(file.getId());
         fileDto.setName(file.getName());
-        fileDto.setURL(file.getURL());
+        fileDto.setLink(file.getLink());
         return fileDto;
-    }
-
-    private void checkFile(String path) {
-        if (Objects.isNull(path)) {
-            throw new IllegalArgumentException("Path can not be null.");
-        }
     }
 
     private String getFileName(String s) {

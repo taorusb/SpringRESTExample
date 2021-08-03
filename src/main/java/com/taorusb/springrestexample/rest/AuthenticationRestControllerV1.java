@@ -22,16 +22,16 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping(value = "/api/v1/login")
-public class AuthenticationControllerV1 {
+public class AuthenticationRestControllerV1 {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserServiceImpl userService;
 
     @Autowired
-    public AuthenticationControllerV1(AuthenticationManager authenticationManager,
-                                      JwtTokenProvider jwtTokenProvider,
-                                      UserServiceImpl userService) {
+    public AuthenticationRestControllerV1(AuthenticationManager authenticationManager,
+                                          JwtTokenProvider jwtTokenProvider,
+                                          UserServiceImpl userService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;

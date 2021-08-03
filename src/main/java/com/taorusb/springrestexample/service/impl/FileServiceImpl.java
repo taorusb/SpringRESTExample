@@ -9,6 +9,7 @@ import com.taorusb.springrestexample.repository.FileRepository;
 import com.taorusb.springrestexample.repository.UserRepository;
 import com.taorusb.springrestexample.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -27,7 +28,7 @@ public class FileServiceImpl implements FileService {
     public FileServiceImpl(FileRepository fileRepository,
                            UserRepository userRepository,
                            EventRepository eventRepository,
-                           AwsS3Actions s3Actions) {
+                          @Qualifier("s3-for-file") AwsS3Actions s3Actions) {
         this.fileRepository = fileRepository;
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
@@ -39,27 +40,20 @@ public class FileServiceImpl implements FileService {
     }
 
     public File update(File entity) {
-        if (Objects.isNull(entity.getId())) {
-            throw new IllegalArgumentException("Id must not be null.");
-        }
-        File forUpdate = fileRepository.getById(entity.getId());
-        s3Actions.deleteObject(forUpdate.getFilePointer() + forUpdate.getName());
-        String newUrl = s3Actions.addObject(forUpdate.getFilePointer() + entity.getName(), entity.getPath());
-        forUpdate.setURL(newUrl);
-        forUpdate.setPath(entity.getPath());
-        forUpdate.setName(entity.getName());
-        fileRepository.save(forUpdate);
-        return forUpdate;
+        File file = fileRepository.getById(entity.getId());
+        s3Actions.deleteObject(file.getFilePointer() + file.getName());
+        String newUrl = s3Actions.addObject(file.getFilePointer() + entity.getName(), entity.getPath());
+        file.setLink(newUrl);
+        file.setPath(entity.getPath());
+        file.setName(entity.getName());
+        return fileRepository.save(file);
     }
 
     public File save(File entity) {
-        if (Objects.isNull(entity.getUserId())) {
-            throw new IllegalArgumentException("Id must not be null.");
-        }
         User user = userRepository.getById(entity.getUserId());
         entity.setFilePointer(getFilePointer(user));
-        entity.setURL(s3Actions.addObject(entity.getFilePointer() + entity.getName(), entity.getPath()));
-        entity = fileRepository.save(entity);
+        entity.setLink(s3Actions.addObject(entity.getFilePointer() + entity.getName(), entity.getPath()));
+        fileRepository.save(entity);
         Event event = new Event();
         event.setUser(user);
         event.setFile(entity);
@@ -77,8 +71,8 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public File getSingleByUserId(Long id, Long fileId) {
-        File file = fileRepository.getSingleByUserId(id, fileId);
+    public File getSingleByUserId(Long id, Long userId) {
+        File file = fileRepository.getSingleByUserId(id, userId);
         if (Objects.isNull(file)) {
             throw new EntityNotFoundException("Entity not found.");
         }
@@ -86,9 +80,11 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void delete(File entity) {
-        s3Actions.deleteObject(entity.getFilePointer() + entity.getName());
-        fileRepository.delete(entity);
+    public File delete(Long id) {
+        File file = getById(id);
+        s3Actions.deleteObject(file.getFilePointer() + file.getName());
+        fileRepository.deleteById(id);
+        return file;
     }
 
     private String getFilePointer(User user) {

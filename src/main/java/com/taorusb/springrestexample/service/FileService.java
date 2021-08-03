@@ -14,7 +14,7 @@ public interface FileService {
 
     List<File> getByUserId(Long id);
 
-    File getSingleByUserId(Long id, Long fileId);
+    File getSingleByUserId(Long id, Long userId);
 
-    void delete(File entity);
+    File delete(Long id);
 }

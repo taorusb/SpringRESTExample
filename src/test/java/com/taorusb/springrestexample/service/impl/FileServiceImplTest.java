@@ -47,7 +47,7 @@ public class FileServiceImplTest {
         user.setUsername("username");
         file.setId(1L);
         file.setName("name");
-        file.setURL("url");
+        file.setLink("url");
         file.setPath("path");
         String filePointer = user.getId() + "-" + user.getUsername() + "/";
         file.setFilePointer(filePointer);
@@ -67,24 +67,16 @@ public class FileServiceImplTest {
     }
 
     @Test
-    public void update_throws_exception() {
-        assertThrows(IllegalArgumentException.class, () -> fileService.update(new File()));
-    }
-
-    @Test
     public void update_returns_file() {
         when(fileRepository.getById(anyLong())).thenReturn(file);
         when(awsS3Actions.addObject(anyString(), anyString())).thenReturn("url");
-        assertEquals(1L, fileService.update(file).getId());
-        assertEquals("url", fileService.update(file).getURL());
-        assertEquals("name", fileService.update(file).getName());
-        assertEquals("path", fileService.update(file).getPath());
-        assertEquals("1-username/", fileService.update(file).getFilePointer());
-    }
-
-    @Test
-    public void save_throws_exception() {
-        assertThrows(IllegalArgumentException.class, () -> fileService.save(new File()));
+        when(fileRepository.save(file)).thenReturn(file);
+        file = fileService.update(file);
+        assertEquals(1L, file.getId());
+        assertEquals("url", file.getLink());
+        assertEquals("name", file.getName());
+        assertEquals("path", file.getPath());
+        assertEquals("1-username/", file.getFilePointer());
     }
 
     @Test
@@ -93,7 +85,7 @@ public class FileServiceImplTest {
         when(awsS3Actions.addObject(anyString(), anyString())).thenReturn("url");
         when(fileRepository.save(file)).thenReturn(file);
         assertEquals(1L, fileService.save(file).getId());
-        assertEquals("url", fileService.save(file).getURL());
+        assertEquals("url", fileService.save(file).getLink());
         assertEquals("name", fileService.save(file).getName());
         assertEquals("path", fileService.save(file).getPath());
         assertEquals("1-username/", fileService.save(file).getFilePointer());
@@ -126,6 +118,7 @@ public class FileServiceImplTest {
 
     @Test
     public void delete() {
-        assertDoesNotThrow(() -> fileService.delete(file));
+        when(fileRepository.findById(1L)).thenReturn(java.util.Optional.ofNullable(file));
+        assertDoesNotThrow(() -> fileService.delete(1L));
     }
 }

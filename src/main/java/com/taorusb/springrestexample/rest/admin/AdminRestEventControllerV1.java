@@ -1,4 +1,4 @@
-package com.taorusb.springrestexample.rest;
+package com.taorusb.springrestexample.rest.admin;
 
 import com.taorusb.springrestexample.dto.EventDto;
 import com.taorusb.springrestexample.model.Event;
@@ -14,16 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class EventControllerV1 {
+public class AdminRestEventControllerV1 {
 
     private final EventService eventService;
 
     @Autowired
-    public EventControllerV1(EventService eventService) {
+    public AdminRestEventControllerV1(EventService eventService) {
         this.eventService = eventService;
     }
 
-    @GetMapping("/api/v1/users/{id}/events")
+    @GetMapping("/api/v1/admin/users/{id}/events")
     public ResponseEntity<List<EventDto>> getMore(@PathVariable Long id) {
         List<EventDto> dtos = new ArrayList<>();
         try {
@@ -39,10 +39,10 @@ public class EventControllerV1 {
         }
     }
 
-    @GetMapping("/api/v1/users/{id}/events/{eventId}")
-    public ResponseEntity getOne(@PathVariable Long id,@PathVariable Long eventId) {
+    @GetMapping("/api/v1/admin/users/{userId}/events/{id}")
+    public ResponseEntity getOne(@PathVariable Long id,@PathVariable Long userId) {
         try {
-            Event event = eventService.findEventByIdAndUserId(eventId, id);
+            Event event = eventService.findEventByIdAndUserId(id, userId);
             return ResponseEntity.ok(EventDto.fromEvent(event));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
