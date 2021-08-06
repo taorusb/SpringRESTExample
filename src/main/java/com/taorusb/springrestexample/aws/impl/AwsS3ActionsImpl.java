@@ -1,16 +1,12 @@
 package com.taorusb.springrestexample.aws.impl;
 
 import com.taorusb.springrestexample.aws.AwsS3Actions;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,10 +20,11 @@ public class AwsS3ActionsImpl implements AwsS3Actions {
 
     private String credentialsProfile;
     private String bucketName;
-
     private S3Client s3Client;
 
     public AwsS3ActionsImpl(String credentialsProfile, String bucketName) {
+        this.credentialsProfile = credentialsProfile;
+        this.bucketName = bucketName;
         Region region = Region.EU_NORTH_1;
         s3Client = S3Client.builder()
                 .region(region)
@@ -48,9 +45,8 @@ public class AwsS3ActionsImpl implements AwsS3Actions {
             s3Client.putObject(putOb, RequestBody.fromBytes(getObjectFile(path)));
             return getObjectUrl(key);
         } catch (S3Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getCause());
         }
-        return "";
     }
 
     private static byte[] getObjectFile(String filePath) {
@@ -64,7 +60,7 @@ public class AwsS3ActionsImpl implements AwsS3Actions {
         } catch (FileNotFoundException e) {
             throw new IllegalArgumentException("File path is invalid.");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getCause());
         } finally {
             if (fileInputStream != null) {
                 try {
@@ -86,7 +82,7 @@ public class AwsS3ActionsImpl implements AwsS3Actions {
                     .build();
             s3Client.deleteObject(deleteObjectRequest);
         } catch (S3Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getCause());
         }
     }
 
@@ -99,8 +95,7 @@ public class AwsS3ActionsImpl implements AwsS3Actions {
             URL url = s3Client.utilities().getUrl(request);
             return url.toString();
         } catch (S3Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getCause());
         }
-        return "";
     }
 }
