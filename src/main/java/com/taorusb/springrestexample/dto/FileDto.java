@@ -11,11 +11,9 @@ import javax.validation.constraints.NotNull;
 public class FileDto {
 
     public interface PostReq {
-
     }
 
     public interface PutReq {
-
     }
 
 

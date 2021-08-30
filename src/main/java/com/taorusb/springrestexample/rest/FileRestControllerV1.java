@@ -24,7 +24,7 @@ public class FileRestControllerV1 {
         this.fileService = fileService;
     }
 
-    @GetMapping("/api/v1/users/{id}/files")
+    @GetMapping(value = {"/api/v1/users/{id}/files", "/api/v1/admin/users/{id}/files"})
     public ResponseEntity<List<FileDto>> getMore(@PathVariable Long id) {
         List<FileDto> dtos = new ArrayList<>();
         try {
@@ -40,7 +40,7 @@ public class FileRestControllerV1 {
         }
     }
 
-    @GetMapping("/api/v1/users/{userId}/files/{id}")
+    @GetMapping(value = {"/api/v1/users/{userId}/files/{id}", "/api/v1/admin/users/{userId}/files/{id}"})
     public ResponseEntity getOne(@PathVariable Long userId, @PathVariable Long id) {
         try {
             File file = fileService.getSingleByUserId(id, userId);
@@ -54,7 +54,7 @@ public class FileRestControllerV1 {
         }
     }
 
-    @PostMapping("/api/v1/file")
+    @PostMapping(value = {"/api/v1/file", "/api/v1/admin/file"})
     public ResponseEntity addFile(@Validated(FileDto.PostReq.class) @RequestBody FileDto fileDto,
                                   BindingResult bindingResult) {
         try {
@@ -71,7 +71,7 @@ public class FileRestControllerV1 {
         }
     }
 
-    @PutMapping("/api/v1/file")
+    @PutMapping(value = {"/api/v1/file", "/api/v1/admin/file"})
     public ResponseEntity updateFile(@Validated(FileDto.PutReq.class) @RequestBody FileDto fileDto,
                                      BindingResult bindingResult) {
         try {
@@ -88,7 +88,7 @@ public class FileRestControllerV1 {
         }
     }
 
-    @DeleteMapping(value = "/api/v1/file/{id}")
+    @DeleteMapping(value = {"/api/v1/file/{id}", "/api/v1/admin/file/{id}"})
     public ResponseEntity deleteFile(@PathVariable Long id) {
         try {
             File file = fileService.delete(id);

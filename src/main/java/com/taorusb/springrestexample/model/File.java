@@ -6,8 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "files")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "file_type")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Data
 public class File extends BaseEntity {
 
@@ -24,5 +23,4 @@ public class File extends BaseEntity {
 
     @Column(name = "link")
     private String link;
-
 }

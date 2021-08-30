@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+ install:
+    runtime-versions:
+      java: corretto11
+ pre_build:
+    on-failure: ABORT
+    commands:
+      - aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 881066265045.dkr.ecr.eu-north-1.amazonaws.com
+      - aws ecr create-repository  --repository-name test-project
+ build:
+    on-failure: ABORT
+    commands:
+      - docker build -t test-project .
+      - docker tag test-project:latest 881066265045.dkr.ecr.eu-north-1.amazonaws.com/test-project:latest
+ post_build:
+      commands:
+        - docker push 881066265045.dkr.ecr.eu-north-1.amazonaws.com/test-project:latest

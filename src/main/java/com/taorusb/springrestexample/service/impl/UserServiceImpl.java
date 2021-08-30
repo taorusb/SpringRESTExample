@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -33,9 +32,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User save(User user) {
-        if (Objects.isNull(user.getUsername()) || Objects.isNull(user.getPassword())) {
-            throw new IllegalArgumentException("Username or password can not be null");
-        }
         Role roleUser = roleRepository.findByName("ROLE_USER");
         List<Role> userRoles = new ArrayList<>();
         userRoles.add(roleUser);
@@ -58,9 +54,6 @@ public class UserServiceImpl implements UserService {
     }
 
     public User update(User entity) {
-        if (Objects.isNull(entity.getId()) || Objects.isNull(entity.getUsername())) {
-            throw new IllegalArgumentException("Username or id can not be null");
-        }
         User user = userRepository.findById(entity.getId()).orElseThrow(EntityNotFoundException::new);
         user.setUsername(entity.getUsername());
         userRepository.save(user);

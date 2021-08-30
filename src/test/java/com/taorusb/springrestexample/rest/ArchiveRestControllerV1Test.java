@@ -1,6 +1,7 @@
 package com.taorusb.springrestexample.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.taorusb.springrestexample.model.BuildingStatus;
 import com.taorusb.springrestexample.model.ZipArchive;
 import com.taorusb.springrestexample.service.ZipArchiveService;
 import org.junit.Before;
@@ -47,23 +48,24 @@ public class ArchiveRestControllerV1Test {
 
     @Before
     public void setUp() throws Exception {
+        BuildingStatus status = new BuildingStatus();
+        status.setName("IN_PROCESS");
         zipArchive.setId(1L);
         zipArchive.setPath("/test/folder/1.txt");
         zipArchive.setUserId(1L);
         zipArchive.setName("1.txt");
         zipArchive.setLink("url");
         zipArchive.setFilePointer("1-username/");
+        zipArchive.setBuildingStatus(status);
+        zipArchive.setProjectName("project");
         archiveList.add(zipArchive);
         mockMvc = MockMvcBuilders.standaloneSetup(new ArchiveRestControllerV1(zipArchiveService)).build();
-        when(zipArchiveService.getByUserId(1L)).thenReturn(archiveList);
-        when(zipArchiveService.getByUserId(2L)).thenThrow(EntityNotFoundException.class);
-        when(zipArchiveService.getSingleByUserId(1L, 1L)).thenReturn(zipArchive);
-        when(zipArchiveService.getSingleByUserId(2L, 2L)).thenThrow(EntityNotFoundException.class);
     }
 
     @WithMockUser
     @Test
     public void getMore_returns_200() throws Exception {
+        when(zipArchiveService.getByUserId(1L)).thenReturn(archiveList);
         mockMvc.perform(get("/api/v1/users/{userId}/archives", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(archiveList.size())));
@@ -72,6 +74,7 @@ public class ArchiveRestControllerV1Test {
     @WithMockUser
     @Test
     public void getMore_returns_404() throws Exception {
+        when(zipArchiveService.getByUserId(2L)).thenThrow(EntityNotFoundException.class);
         mockMvc.perform(get("/api/v1/users/{userId}/archives", 2L))
                 .andExpect(status().isNotFound());
     }
@@ -79,16 +82,19 @@ public class ArchiveRestControllerV1Test {
     @WithMockUser
     @Test
     public void getOne_returns_200() throws Exception {
+        when(zipArchiveService.getSingleByUserId(1L, 1L)).thenReturn(zipArchive);
         mockMvc.perform(get("/api/v1/users/{userId}/archives/{id}", 1L, 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("1.txt")))
-                .andExpect(jsonPath("$.link", is("url")));
+                .andExpect(jsonPath("$.link", is("url")))
+                .andExpect(jsonPath("$.buildStatus", is("IN_PROCESS")));
     }
 
     @WithMockUser
     @Test
     public void getOne_returns_404() throws Exception {
+        when(zipArchiveService.getSingleByUserId(2L, 2L)).thenThrow(EntityNotFoundException.class);
         mockMvc.perform(get("/api/v1/users/{userId}/archives/{id}", 2L, 2L))
                 .andExpect(status().isNotFound());
     }
@@ -103,7 +109,8 @@ public class ArchiveRestControllerV1Test {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("1.txt")))
-                .andExpect(jsonPath("$.link", is("url")));
+                .andExpect(jsonPath("$.link", is("url")))
+                .andExpect(jsonPath("$.buildStatus", is("IN_PROCESS")));
 
     }
 
@@ -140,7 +147,8 @@ public class ArchiveRestControllerV1Test {
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("1.txt")))
-                .andExpect(jsonPath("$.link", is("url")));
+                .andExpect(jsonPath("$.link", is("url")))
+                .andExpect(jsonPath("$.buildStatus", is("IN_PROCESS")));
     }
 
     @WithMockUser
@@ -175,7 +183,8 @@ public class ArchiveRestControllerV1Test {
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("1.txt")))
-                .andExpect(jsonPath("$.link", is("url")));
+                .andExpect(jsonPath("$.link", is("url")))
+                .andExpect(jsonPath("$.buildStatus", is("IN_PROCESS")));
     }
 
     @WithMockUser

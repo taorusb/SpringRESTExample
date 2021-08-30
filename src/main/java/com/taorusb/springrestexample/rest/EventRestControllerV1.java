@@ -23,7 +23,7 @@ public class EventRestControllerV1 {
         this.eventService = eventService;
     }
 
-    @GetMapping("/api/v1/users/{id}/events")
+    @GetMapping(value = {"/api/v1/users/{id}/events", "/api/v1/admin/users/{id}/events"})
     public ResponseEntity<List<EventDto>> getMore(@PathVariable Long id) {
         List<EventDto> dtos = new ArrayList<>();
         try {
@@ -39,7 +39,7 @@ public class EventRestControllerV1 {
         }
     }
 
-    @GetMapping("/api/v1/users/{userId}/events/{id}")
+    @GetMapping(value = {"/api/v1/users/{userId}/events/{id}", "/api/v1/admin/users/{userId}/events/{id}"})
     public ResponseEntity getOne(@PathVariable Long id,@PathVariable Long userId) {
         try {
             Event event = eventService.findEventByIdAndUserId(id, userId);

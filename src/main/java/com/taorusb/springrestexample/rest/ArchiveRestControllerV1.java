@@ -24,7 +24,7 @@ public class ArchiveRestControllerV1 {
         this.archiveService = archiveService;
     }
 
-    @GetMapping("/api/v1/users/{id}/archives")
+    @GetMapping(value = {"/api/v1/users/{id}/archives", "/api/v1/admin/users/{id}/archives"})
     public ResponseEntity<List<ZipArchiveDto>> getMore(@PathVariable Long id) {
         List<ZipArchiveDto> dtos = new ArrayList<>();
         try {
@@ -32,6 +32,7 @@ public class ArchiveRestControllerV1 {
                 ZipArchiveDto zipArchiveDto = new ZipArchiveDto();
                 zipArchiveDto.setId(archive.getId());
                 zipArchiveDto.setName(archive.getName());
+                zipArchiveDto.setBuildStatus(archive.getBuildingStatus().getName());
                 dtos.add(zipArchiveDto);
             });
             return ResponseEntity.ok(dtos);
@@ -40,7 +41,7 @@ public class ArchiveRestControllerV1 {
         }
     }
 
-    @GetMapping("/api/v1/users/{userId}/archives/{id}")
+    @GetMapping(value = {"/api/v1/users/{userId}/archives/{id}", "/api/v1/admin/users/{userId}/archives/{id}"})
     public ResponseEntity getOne(@PathVariable Long userId,@PathVariable Long id) {
         try {
             ZipArchive zipArchive = archiveService.getSingleByUserId(id, userId);
@@ -48,18 +49,19 @@ public class ArchiveRestControllerV1 {
             zipArchiveDto.setId(zipArchive.getId());
             zipArchiveDto.setName(zipArchive.getName());
             zipArchiveDto.setLink(zipArchive.getLink());
+            zipArchiveDto.setBuildStatus(zipArchive.getBuildingStatus().getName());
             return ResponseEntity.ok(zipArchiveDto);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @PostMapping("/api/v1/archive")
+    @PostMapping(value = {"/api/v1/archive", "/api/v1/admin/archive"})
     public ResponseEntity addArchive(@Validated(ZipArchiveDto.PostReq.class) @RequestBody ZipArchiveDto zipArchiveDto,
                                      BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
-                throw new IllegalArgumentException("Some filed has errors.");
+                return ResponseEntity.badRequest().build();
             }
             ZipArchive zipArchive =  zipArchiveDto.toArchive();
             zipArchiveDto = ZipArchiveDto.fromArchive(archiveService.save(zipArchive));
@@ -71,7 +73,7 @@ public class ArchiveRestControllerV1 {
         }
     }
 
-    @PutMapping("/api/v1/archive")
+    @PutMapping(value = {"/api/v1/archive", "/api/v1/admin/archive"})
     public ResponseEntity updateFile(@Validated(ZipArchiveDto.PutReq.class) @RequestBody ZipArchiveDto zipArchiveDto,
                                      BindingResult bindingResult) {
         try {
@@ -88,7 +90,7 @@ public class ArchiveRestControllerV1 {
         }
     }
 
-    @DeleteMapping(value = "/api/v1/archive/{id}")
+    @DeleteMapping(value = {"/api/v1/archive/{id}", "/api/v1/admin/archive/{id}"})
     public ResponseEntity deleteArchive(@PathVariable Long id) {
         try {
             ZipArchive zipArchive = archiveService.delete(id);

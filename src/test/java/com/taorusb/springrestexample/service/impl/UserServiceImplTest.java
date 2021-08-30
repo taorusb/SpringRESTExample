@@ -53,11 +53,6 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void save_throws_exception() {
-        assertThrows(IllegalArgumentException.class, () -> userService.save(new User()));
-    }
-
-    @Test
     public void save_returns_user() {
         when(bCryptPasswordEncoder.encode("123")).thenReturn("123");
         when(userRepository.save(any(User.class))).thenReturn(user);
@@ -89,13 +84,6 @@ public class UserServiceImplTest {
         users.add(user);
         when(userRepository.findAll()).thenReturn(users);
         assertEquals(1, userService.findAll().size());
-    }
-
-    @Test
-    public void update_throws_exception() {
-        assertThrows(IllegalArgumentException.class, () -> userService.update(new User()));
-        when(userRepository.findById(anyLong())).thenThrow(EntityNotFoundException.class);
-        assertThrows(EntityNotFoundException.class, () -> userService.update(user));
     }
 
     @Test

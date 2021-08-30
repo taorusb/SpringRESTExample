@@ -1,6 +1,7 @@
 package com.taorusb.springrestexample.aws.impl;
 
 import com.taorusb.springrestexample.aws.AwsS3Actions;
+import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
@@ -18,35 +19,27 @@ import java.util.Map;
 
 public class AwsS3ActionsImpl implements AwsS3Actions {
 
-    private String credentialsProfile;
     private String bucketName;
     private S3Client s3Client;
 
-    public AwsS3ActionsImpl(String credentialsProfile, String bucketName) {
-        this.credentialsProfile = credentialsProfile;
+    public AwsS3ActionsImpl(String bucketName) {
         this.bucketName = bucketName;
-        Region region = Region.EU_NORTH_1;
         s3Client = S3Client.builder()
-                .region(region)
-                .credentialsProvider(ProfileCredentialsProvider.create(credentialsProfile))
+                .credentialsProvider(InstanceProfileCredentialsProvider.builder().build())
                 .build();
     }
 
     @Override
     public String addObject(String key, String path) {
-        try {
-            Map<String, String> metadata = new HashMap<>();
-            metadata.put("x-amz-meta-myVal", "test");
-            PutObjectRequest putOb = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(key)
-                    .metadata(metadata)
-                    .build();
-            s3Client.putObject(putOb, RequestBody.fromBytes(getObjectFile(path)));
-            return getObjectUrl(key);
-        } catch (S3Exception e) {
-            throw new RuntimeException(e.getCause());
-        }
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("x-amz-meta-myVal", "test");
+        PutObjectRequest putOb = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .metadata(metadata)
+                .build();
+        s3Client.putObject(putOb, RequestBody.fromBytes(getObjectFile(path)));
+        return getObjectUrl(key);
     }
 
     private static byte[] getObjectFile(String filePath) {

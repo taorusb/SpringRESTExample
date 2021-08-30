@@ -6,6 +6,7 @@ import com.taorusb.springrestexample.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
@@ -22,7 +23,7 @@ public class UserRestControllerV1 {
         this.userService = userService;
     }
 
-    @GetMapping("/api/v1/users")
+    @GetMapping(value = {"/api/v1/users", "/api/v1/admin/users"})
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> dtos = new ArrayList<>();
         userService.findAll().forEach(user -> {
@@ -34,7 +35,7 @@ public class UserRestControllerV1 {
         return ResponseEntity.ok(dtos);
     }
 
-    @GetMapping(value = "/api/v1/users/{id}")
+    @GetMapping(value = {"/api/v1/users/{id}", "/api/v1/admin/users/{id}"})
     public ResponseEntity getUser(@PathVariable Long id) {
         try {
             User user = userService.getById(id);
@@ -44,8 +45,8 @@ public class UserRestControllerV1 {
         }
     }
 
-    @PostMapping("/api/v1/user")
-    public ResponseEntity saveUser(@RequestBody UserDto userDto) {
+    @PostMapping(value = {"/api/v1/user", "/api/v1/admin/user"})
+    public ResponseEntity saveUser(@Validated(UserDto.PostReq.class) @RequestBody UserDto userDto) {
         User user = userDto.toUser();
         try {
             userDto = UserDto.getUserDto(userService.save(user));
@@ -55,8 +56,8 @@ public class UserRestControllerV1 {
         }
     }
 
-    @PutMapping("/api/v1/user")
-    public ResponseEntity updateUser(@RequestBody UserDto userDto) {
+    @PutMapping(value = {"/api/v1/user", "/api/v1/admin/user"})
+    public ResponseEntity updateUser(@Validated(UserDto.PutReq.class) @RequestBody UserDto userDto) {
         User user = userDto.toUser();
         try {
             userDto = UserDto.getUserDto(userService.update(user));
@@ -68,7 +69,7 @@ public class UserRestControllerV1 {
         }
     }
 
-    @DeleteMapping(value = "/api/v1/user/{id}")
+    @DeleteMapping(value = {"/api/v1/user/{id}", "/api/v1/admin/user/{id}"})
     public ResponseEntity deleteUser(@PathVariable Long id) {
         try {
             User user = userService.getById(id);

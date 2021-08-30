@@ -11,11 +11,9 @@ import javax.validation.constraints.NotNull;
 public class ZipArchiveDto {
 
     public interface PostReq {
-
     }
 
     public interface PutReq {
-
     }
 
     @NotNull(groups = PostReq.class)
@@ -26,6 +24,9 @@ public class ZipArchiveDto {
     private String link;
     @NotNull(groups = {PostReq.class, PutReq.class})
     private String path;
+    private String buildStatus;
+    @NotNull(groups = {PostReq.class, PutReq.class})
+    private String projectName;
 
     public ZipArchive toArchive() {
         ZipArchive zipArchive = new ZipArchive();
@@ -34,6 +35,7 @@ public class ZipArchiveDto {
         zipArchive.setName(getName(path));
         zipArchive.setLink(link);
         zipArchive.setPath(path);
+        zipArchive.setProjectName(projectName);
         return zipArchive;
     }
 
@@ -42,6 +44,7 @@ public class ZipArchiveDto {
         zipArchiveDto.setId(zipArchive.getId());
         zipArchiveDto.setLink(zipArchive.getLink());
         zipArchiveDto.setName(zipArchive.getName());
+        zipArchiveDto.setBuildStatus(zipArchive.getBuildingStatus().getName());
         return zipArchiveDto;
     }
 

@@ -1,7 +1,7 @@
 FROM gradle:7.1.0-jdk11-openj9 AS build
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
-RUN gradle build test --no-daemon
+RUN gradle build test
 
 FROM adoptopenjdk:11-jre-openj9
 EXPOSE 8080

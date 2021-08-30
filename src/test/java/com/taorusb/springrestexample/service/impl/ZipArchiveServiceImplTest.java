@@ -1,9 +1,13 @@
 package com.taorusb.springrestexample.service.impl;
 
+import com.taorusb.springrestexample.aws.AwsCodebuildActions;
 import com.taorusb.springrestexample.aws.AwsS3Actions;
+import com.taorusb.springrestexample.aws.AwsSqsActions;
+import com.taorusb.springrestexample.model.BuildingStatus;
 import com.taorusb.springrestexample.model.User;
 import com.taorusb.springrestexample.model.ZipArchive;
 import com.taorusb.springrestexample.repository.ArchiveRepository;
+import com.taorusb.springrestexample.repository.BuildingStatusRepository;
 import com.taorusb.springrestexample.repository.EventRepository;
 import com.taorusb.springrestexample.repository.UserRepository;
 import org.junit.Before;
@@ -34,22 +38,35 @@ public class ZipArchiveServiceImplTest {
     EventRepository eventRepository;
 
     @Mock
+    BuildingStatusRepository buildingStatusRepository;
+
+    @Mock
     UserRepository userRepository;
 
     @Mock
     AwsS3Actions awsS3Actions;
+
+    @Mock
+    AwsSqsActions awsSqsActions;
+
+    @Mock
+    AwsCodebuildActions awsCodebuildActions;
 
     User user = new User();
     ZipArchive zipArchive = new ZipArchive();
 
     @Before
     public void setUp() throws Exception {
+        BuildingStatus status = new BuildingStatus();
+        status.setName("IN_PROCESS");
         user.setId(1L);
         user.setUsername("username");
         zipArchive.setId(1L);
         zipArchive.setName("name");
         zipArchive.setLink("url");
         zipArchive.setPath("path");
+        zipArchive.setBuildingStatus(status);
+        zipArchive.setProjectName("project");
         String filePointer = user.getId() + "-" + user.getUsername() + "/";
         zipArchive.setFilePointer(filePointer);
         zipArchive.setUserId(1L);
@@ -72,12 +89,15 @@ public class ZipArchiveServiceImplTest {
         when(archiveRepository.getById(anyLong())).thenReturn(zipArchive);
         when(awsS3Actions.addObject(anyString(), anyString())).thenReturn("url");
         when(archiveRepository.save(zipArchive)).thenReturn(zipArchive);
+        when(awsCodebuildActions.createProject(anyString(), anyString())).thenReturn("project");
+        when(awsSqsActions.getMessage(anyString())).thenReturn("IN_PROCESS");
         zipArchive = zipArchiveService.update(zipArchive);
         assertEquals(1L, zipArchive.getId());
         assertEquals("url", zipArchive.getLink());
         assertEquals("name", zipArchive.getName());
         assertEquals("path", zipArchive.getPath());
         assertEquals("1-username/", zipArchive.getFilePointer());
+        assertEquals("project", zipArchive.getProjectName());
     }
 
     @Test
@@ -85,11 +105,14 @@ public class ZipArchiveServiceImplTest {
         when(userRepository.getById(anyLong())).thenReturn(user);
         when(awsS3Actions.addObject(anyString(), anyString())).thenReturn("url");
         when(archiveRepository.save(zipArchive)).thenReturn(zipArchive);
+        when(awsCodebuildActions.createProject(anyString(), anyString())).thenReturn("project");
+        when(awsSqsActions.getMessage(anyString())).thenReturn("IN_PROCESS");
         assertEquals(1L, zipArchiveService.save(zipArchive).getId());
         assertEquals("url", zipArchiveService.save(zipArchive).getLink());
         assertEquals("name", zipArchiveService.save(zipArchive).getName());
         assertEquals("path", zipArchiveService.save(zipArchive).getPath());
         assertEquals("1-username/", zipArchiveService.save(zipArchive).getFilePointer());
+        assertEquals("project", zipArchive.getProjectName());
     }
 
     @Test
